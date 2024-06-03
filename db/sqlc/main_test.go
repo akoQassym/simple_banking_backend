@@ -10,18 +10,19 @@ import (
 	_ "github.com/lib/pq"
 )
 
-const dbDriver = "postgres"
 const dbSource = "postgresql://root:secret@localhost:5433/simple_bank?sslmode=disable"
 
 var testQueries *Queries
+var testDB *pgxpool.Pool
 
 func TestMain(m *testing.M) {
-	conn, err := pgxpool.New(context.Background(), dbSource)
+	var err error
+	testDB, err = pgxpool.New(context.Background(), dbSource)
 	if err != nil {
 		log.Fatal("Cannot connect to DB:", err)
 	}
 
-	testQueries = New(conn)
+	testQueries = New(testDB)
 
 	os.Exit(m.Run())
 }
